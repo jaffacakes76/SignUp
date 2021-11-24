@@ -35,6 +35,17 @@ export class Jobad
         input.type = "date";
         input.className = "inputDeadline"
         input.value = this.deadline;
+        var dl = new Date();
+        var date =dl.getFullYear();
+        if(dl.getMonth()+1<10)
+            date+="-0"+(dl.getMonth()+1);
+        else
+            date+="-"+(dl.getMonth()+1);
+        if(dl.getDate()+1<10)
+            date+="-0"+(dl.getDate());
+        else
+            date+="-"+dl.getDate();
+        input.min = date;
         td.appendChild(input);
         row.appendChild(td);
 
@@ -160,7 +171,8 @@ export class Jobad
                 id: this.id,
                 position: position,
                 deadline: deadline,
-                remote: remote
+                remote: remote,
+                numApl: this.numApl
             })
         }).then(p => {
             if (p.ok) {

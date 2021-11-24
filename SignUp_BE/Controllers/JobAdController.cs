@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -57,10 +56,16 @@ namespace SignUp_BE.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> Add([FromBody] JobAd jobad, int companyId)
         {
+            if(companyId < 0)
+                return BadRequest("CompanyID not valid!"); 
+            if(jobad.Deadline.Date < DateTime.Now.Date)
+                return BadRequest("Deadline not valid!");
+            if(string.IsNullOrEmpty(jobad.Position))
+                return BadRequest("Position is null or empty!");
+            if(jobad.NumApl < 0)
+                return BadRequest("NumApl is < 0!");
             try
             {
-                if(jobad.Deadline < DateTime.Now)
-                    return BadRequest("Deadline not valid!");
                 Company company = await Context.Companies.Include(c => c.Ads).FirstOrDefaultAsync(c => c.ID == companyId);
                 jobad.Company = company;
                 company.Ads.Add(jobad);
@@ -83,14 +88,17 @@ namespace SignUp_BE.Controllers
         {
             try
             {
-                User user = await Context.Users.Include(u => u.Ads).FirstOrDefaultAsync(u => u.Username == username);
+                User user = await Context.Users.Include(u => u.Ads).FirstOrDefaultAsync(u => u.Username.Equals(username));
 
                 if(user == null)
-                    return BadRequest("User does not exist!");
+                    return NotFound("User does not exist!");
 
                 JobAd jobad = await Context.JobAds.Include(j => j.Users).FirstOrDefaultAsync(jb => jb.ID == jobid);
 
-                User checkUser = jobad.Users.Find(u => u.Username == username);
+                if(jobad == null)
+                    return BadRequest("JobAd does not exist!");
+
+                User checkUser = jobad.Users.Find(u => u.Username.Equals(username));
 
                 if(checkUser != null)
                     return BadRequest("User has already applied for that job!");
@@ -116,6 +124,12 @@ namespace SignUp_BE.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> Update([FromBody] JobAd jobad)
         {
+            if(jobad.Deadline.Date < DateTime.Now.Date)
+                return BadRequest("Deadline not valid!");
+            if(string.IsNullOrEmpty(jobad.Position))
+                return BadRequest("Position is null or empty!");
+            if(jobad.NumApl < 0)
+                return BadRequest("NumApl is < 0!");
             try
             {
                 Context.JobAds.Update(jobad);

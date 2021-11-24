@@ -56,6 +56,12 @@ namespace SignUp_BE.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> Add([FromBody] Company company)
         {
+            if(string.IsNullOrEmpty(company.Name) || company.Name.Length > 30 )
+                return BadRequest("Company name error!");
+            if(string.IsNullOrEmpty(company.Address) || company.Address.Length > 30)
+                return BadRequest("Company address error!");
+            if(string.IsNullOrEmpty(company.Description) || company.Description.Length >30)
+                return BadRequest("Company description error!");
             try
             {
                 Context.Companies.Add(company);
@@ -74,6 +80,12 @@ namespace SignUp_BE.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> Update([FromBody] Company company)
         {
+            if(string.IsNullOrEmpty(company.Name) || company.Name.Length > 30 )
+                return BadRequest("Company name error!");
+            if(string.IsNullOrEmpty(company.Address) || company.Address.Length > 30)
+                return BadRequest("Company address error!");
+            if(string.IsNullOrEmpty(company.Description) || company.Description.Length >30)
+                return BadRequest("Company description error!");
             try
             {
                 Context.Companies.Update(company);
